@@ -1,0 +1,85 @@
+#!/bin/bash
+ME=`basename "$0"`
+
+# Initial values
+DIRECTORY='.'
+
+# image may be NULL
+IMAGE=`echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'`
+
+# branch may be NULL
+BRANCH=`echo $GITHUB_REF | sed -e "s/refs\/heads\///g"`
+
+# if this is a PR, then set BRANCH to the MERGING branch
+if [ $GITHUB_HEAD_REF ] 
+then
+  BRANCH=$GITHUB_HEAD_REF
+fi
+
+# capture the GIT_TAG or NULL
+GIT_TAG=`echo ${GITHUB_REF} | sed -e "s/refs\/tags\///g"`
+
+# IF GITHUB_REF doesn't exist, then latest
+# If this is a TAG, then use a TAG
+# If this is a BRANCH, then use BRANCH (unless branch is master)
+# Else use latest
+if [ -z $GITHUB_REF ]
+then
+  TAG='latest'
+elif [ $GIT_TAG != $GITHUB_REF ]
+then
+  TAG=$GIT_TAG
+elif [ $BRANCH != $GITHUB_REF ] && [ $BRANCH != 'master' ]
+then
+  TAG=$BRANCH
+else
+  TAG='latest'
+fi
+
+# Process CL Args
+while getopts ":d:u:p:r:t:i:sh" opt; do
+  case ${opt} in
+    d ) # directory
+      DIRECTORY=$OPTARG;;
+    u ) # username
+      USERNAME=$OPTARG;;
+    p ) # password
+      PASSWORD=$OPTARG;;
+    r ) # password
+      REGISTRY=$OPTARG;;
+    s ) # sha
+      SHA=true;;
+    t ) # tag
+      TAG=$OPTARG;;
+    i ) # image
+      IMAGE=$OPTARG;;
+    \? )
+      echo "Invalid option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+  esac
+done
+
+DOCKERNAME="${IMAGE}:${TAG}"
+
+if [ -z $USERNAME ] || [ -z $PASSWORD ]
+then
+  echo "Username (-u) or Password (-p) was not specified."
+  exit 1
+fi
+
+docker login -u ${USERNAME} -p ${PASSWORD}
+
+# build and tag the known version
+docker build -t $DOCKERNAME $DIRECTORY
+docker push $DOCKERNAME
+
+# if requested, and we know the SHA, then build a SHA version
+if [ "$SHA" ] && [ "$GITHUB_SHA" ]
+then
+  DOCKERSHA="${IMAGE}:${GITHUB_SHA}"
+  docker build -t $DOCKERSHA $DIRECTORY
+  docker push $DOCKERSHA
+fi
+
+docker logout

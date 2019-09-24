@@ -1,0 +1,8 @@
+# No log files
+*.log
+
+# Ignore all hidden files, except these
+.*
+!.gitignore
+!.github/
+*.rpm
