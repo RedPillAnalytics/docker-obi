@@ -10,7 +10,7 @@
 
 # env variables set by Dockerfile
 # ORACLE_BASE=/opt/oracle
-# ORACLE_HOME=/opt/oracle/biee
+# OBI_HOME=/opt/oracle/biee
 
 #
 # set values based on env variables or default values
@@ -18,9 +18,10 @@
 
 # - BI_CONFIG_RCU_DBSTRING
 if [ "$BI_CONFIG_RCU_DBSTRING" == "" ]; then
-  echo "BI_CONFIG_RCU_DBSTRING not defined, can't validate RCU schemas creation"
-  exit 1
+  BI_CONFIG_RCU_DBSTRING="${HOSTNAME}:1521:XE"
+  echo "BI_CONFIG_RCU_DBSTRING not defined, default: $BI_CONFIG_RCU_DBSTRING"
 fi;
+
 
 # - BI_CONFIG_RCU_USER
 if [ "$BI_CONFIG_RCU_USER" == "" ]; then
@@ -101,19 +102,19 @@ RCU_SETTINGS="$RCU_SETTINGS $DBCONN_PARAM"
 RCU_SETTINGS="$RCU_SETTINGS $COMPONENTS"
 
 # write password in file
-(echo $BI_CONFIG_RCU_PWD; echo "password") > $ORACLE_HOME/_tmp_rcu.dat
+(echo $BI_CONFIG_RCU_PWD; echo "password") > $OBI_HOME/_tmp_rcu.dat
 
 #
 # validate RCU create command and settings 
 #
-$ORACLE_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate -f < $ORACLE_HOME/_tmp_rcu.dat
+$OBI_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate -f < $OBI_HOME/_tmp_rcu.dat
 
 if [ $? -ne 0 ]; then
   echo "ERROR validating RCU command and settings, can't validate RCU schemas creation"
-  echo "command: $ORACLE_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate -f < $ORACLE_HOME/_tmp_rcu.dat"
-  rm $ORACLE_HOME/_tmp_rcu.dat
+  echo "command: $OBI_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate -f < $OBI_HOME/_tmp_rcu.dat"
+  rm $OBI_HOME/_tmp_rcu.dat
   exit 1
 fi
 
 # remove password file
-rm $ORACLE_HOME/_tmp_rcu.dat
+rm $OBI_HOME/_tmp_rcu.dat
