@@ -6,3 +6,6 @@
 !.gitignore
 !.github/
 *.rpm
+*.jar
+*.bin
+*.zip

@@ -1,5 +1,5 @@
-# docker-build
-A template repository for building docker images and publishing them to Docker Hub. At the moment, this uses GitHub Actions, but not sure of the longterm direction.
+# docker-obi
+Builds docker images for Oracle Business Intelligence.
 
 The following Github *secrets* are used as part of the build and publish process:
 
