@@ -51,7 +51,8 @@ RUN sed -i -e "s|###ORACLE_HOME###|$ORACLE_HOME|g"   $ORACLE_BASE/$INSTALL_FILE_
     sed -i -e "s|source=file:/dev/random|source=file:/dev/urandom|g"     /usr/java/default/jre/lib/security/java.security  && \
     sed -i -e "s|source=file:/dev/urandom|source=file:/dev/./urandom|g"  /usr/java/default/jre/lib/security/java.security
 
-RUN echo $ORACLE_HOME
+# Set permissions
+RUN chmod a+x $INSTALL_DIR/$INSTALL_FILE_BI_1
 
 # Install FMW Infrastructure
 USER oracle
@@ -73,7 +74,7 @@ FROM base
 COPY --chown=root:root --from=builder /usr /usr
 COPY --chown=root:root --from=builder /etc /etc
 COPY --chown=oracle:oinstall --from=builder $ORACLE_HOME $ORACLE_HOME
-COPY --chown=oracle:oinstall --from=builder $DOMAIN_HOME $DOMAIN_HOME
+#COPY --chown=oracle:oinstall --from=builder $DOMAIN_HOME $DOMAIN_HOME
 
 # CMD exec $ORACLE_BASE/$RUN_FILE
 CMD bash
