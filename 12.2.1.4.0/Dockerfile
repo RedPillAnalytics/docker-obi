@@ -62,7 +62,7 @@ RUN touch $ORACLE_BASE/oraInst.loc && \
 
 # Install OBI
 USER oracle
-RUN $INSTALL_DIR/INSTALL_FILE_BI_1 -silent -responseFile $ORACLE_BASE/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
+RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -responseFile $ORACLE_BASE/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 # -------------------------------------------
 # Final stage for copying directories
