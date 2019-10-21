@@ -62,7 +62,7 @@ sed -i -e "s|###BI_CONFIG_ADMIN_PWD###|$BI_CONFIG_ADMIN_PWD|g" $RSP_FILE
 
 # - BI_CONFIG_RCU_DBSTRING
 if [ "$BI_CONFIG_RCU_DBSTRING" == "" ]; then
-  BI_CONFIG_RCU_DBSTRING="${HOSTNAME}:1521:XE"
+  BI_CONFIG_RCU_DBSTRING="localhost:1521:XE"
   echo "BI_CONFIG_RCU_DBSTRING not defined, default: $BI_CONFIG_RCU_DBSTRING"
 fi;
 sed -i -e "s|###BI_CONFIG_RCU_DBSTRING###|$BI_CONFIG_RCU_DBSTRING|g" $RSP_FILE
@@ -83,7 +83,7 @@ sed -i -e "s|###BI_CONFIG_RCU_PWD###|$BI_CONFIG_RCU_PWD|g" $RSP_FILE
 
 # - BI_CONFIG_RCU_DB_PREFIX
 if [ "$BI_CONFIG_RCU_DB_PREFIX" == "" ]; then
-  BI_CONFIG_RCU_DB_PREFIX=$(hostname -f)
+  BI_CONFIG_RCU_DB_PREFIX=$HOSTNAME
   # DB prefix must start with a letter: replace first digit with 'G-P' (not hexa chars)
   case ${BI_CONFIG_RCU_DB_PREFIX:0:1} in
     0)
