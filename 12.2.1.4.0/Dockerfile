@@ -50,8 +50,8 @@ ENV OBI_HOME=$ORACLE_BASE/product/$OBIEE_VERSION \
 
 # Copy scripts and configs
 # -------------
-COPY $PWD_FILE $CHECK_DB_FILE $CONF_FILE $ADD_GCLOUD $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
-COPY $INSTALL_FILE_RSP_CONFIG $RUN_DB $RUN_OBIEE _configureOBIEE.sh _dropRCU.sh _validateRCU.sh $WAIT_DB_CLASS $WAIT_DB_SCRIPT $ORACLE_BASE/
+COPY $ADD_GCLOUD $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
+COPY $CONF_FILE $CHECK_DB_FILE $PWD_FILE $INSTALL_FILE_RSP_CONFIG $RUN_DB $RUN_OBIEE _configureOBIEE.sh _dropRCU.sh _validateRCU.sh $WAIT_DB_CLASS $WAIT_DB_SCRIPT $ORACLE_BASE/
 
 RUN cd $INSTALL_DIR && \
     yum -y install which unzip.x86_64 file openssl oracle-database-preinstall-18c
@@ -161,24 +161,5 @@ FROM base as runtime
 
 COPY --chown=root:root --from=builder /etc /etc
 COPY --chown=oracle:oinstall --from=builder $ORACLE_BASE $ORACLE_BASE
-
-RUN $ORACLE_BASE/oraInventory/orainstRoot.sh && \
-    $ORACLE_HOME/root.sh && \
-    mkdir -p $ORACLE_BASE/scripts/setup && \
-    mkdir $ORACLE_BASE/scripts/startup && \
-    ln -s $ORACLE_BASE/scripts /docker-entrypoint-initdb.d && \
-    mkdir -p $ORACLE_BASE/oradata $ORACLE_BASE/diag $ORACLE_BASE/fast_recovery_area $ORACLE_BASE/tools /home/oracle && \
-    chown -R oracle:oinstall $ORACLE_BASE/oradata $ORACLE_BASE/diag $ORACLE_BASE/fast_recovery_area $ORACLE_BASE/tools /home/oracle && \
-    mv $INSTALL_DIR/$RUN_DB $ORACLE_BASE/ && \
-    mv $INSTALL_DIR/$PWD_FILE $ORACLE_BASE/ && \
-    mv $INSTALL_DIR/$CHECK_DB_FILE $ORACLE_BASE/ && \
-    mv $INSTALL_DIR/$CONF_FILE /etc/sysconfig/ && \
-    unzip $INSTALL_DIR/$CUSTOM_SQL -d $ORACLE_BASE/scripts/setup && \
-    ln -s $ORACLE_BASE/$PWD_FILE / && \
-    cd $HOME && \
-    rm -rf $INSTALL_DIR && \
-    target_txt=$(cat /etc/security/limits.d/oracle-database-preinstall-18c.conf | grep -e 'oracle *hard *memlock*') && \
-    sed -i "/^$target_txt/ c#$target_txt" /etc/security/limits.d/oracle-database-preinstall-18c.conf && \
-    chmod ug+x $ORACLE_BASE/*.sh
 
 CMD bash
