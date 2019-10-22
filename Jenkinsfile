@@ -15,7 +15,7 @@ pipeline {
          }
       }
       stage('Publish') {
-         when { branch "master" }
+         //when { branch "master" }
          steps {
             sh "docker login -u ${DOCKER_USR} -p ${DOCKER_PSW}"
             sh "docker push redpillanalytics/obi:12.2.1.4.0"

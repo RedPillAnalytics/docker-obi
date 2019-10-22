@@ -1,19 +1,21 @@
 # Install the JDK on oracle linux
-FROM oraclelinux:7-slim as jdk
+FROM oraclelinux:7-slim as slim
 
 ENV JDK=jdk-8u221-linux-x64.tar.gz \
-    JDK_DIR=jdk1.8.0_221
+    JDK_DIR=/jdk1.8.0_221
 
-RUN cd $INSTALL_DIR && \
-    yum -y install wget which unzip.x86_64 file openssl oracle-database-preinstall-18c && \
-    wget -q -O $JDK -c --content-disposition \
+ENV PATH=$JDK_DIR/bin:$PATH
+
+RUN yum -y install wget tar gzip
+
+FROM slim as jdk
+
+RUN wget -q -O $JDK -c --content-disposition \
     "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=239835_230deb18db3e4014bb8e3e8324f81b43" && \
     tar xvzf $JDK
 
-ENV PATH=/$JDK_DIR/bin:$PATH
-
 # just need the java executables, nothing else
-FROM jdk as base 
+FROM slim as base 
 COPY --chown=root:root --from=jdk $JDK_DIR $JDK_DIR
 
 ENV ORACLE_BASE=/opt/oracle \
@@ -25,6 +27,7 @@ ENV ORACLE_BASE=/opt/oracle \
     INSTALL_FILE_BI_1=bi_platform-12.2.1.4.0_linux64.bin \
     INSTALL_FILE_BI_2=bi_platform-12.2.1.4.0_linux64-2.zip \
     OBIEE_VERSION=12.2.1.4.0 \
+    INSTALL_DIR=$HOME/install \
     INSTALL_FILE_RSP_WLS=weblogic.rsp \
     INSTALL_FILE_RSP_BI=obiee.rsp \
     INSTALL_FILE_RSP_CONFIG=bi_config.rsp \
@@ -33,7 +36,6 @@ ENV ORACLE_BASE=/opt/oracle \
     PWD_FILE=setPassword.sh \
     CONF_FILE=oracle-xe-18c.conf \
     CHECK_DB_FILE=checkDBStatus.sh \
-    INSTALL_DIR=$HOME/install \
     ORACLE_DOCKER_INSTALL=true \
     NLS_LANG=AMERICAN_AMERICA.AL32UTF8 \
     CUSTOM_SQL=custom.zip \
@@ -51,6 +53,8 @@ ENV OBI_HOME=$ORACLE_BASE/product/$OBIEE_VERSION \
 COPY $PWD_FILE $CHECK_DB_FILE $CONF_FILE $ADD_GCLOUD $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
 COPY $INSTALL_FILE_RSP_CONFIG $RUN_DB $RUN_OBIEE _configureOBIEE.sh _dropRCU.sh _validateRCU.sh $WAIT_DB_CLASS $WAIT_DB_SCRIPT $ORACLE_BASE/
 
+RUN cd $INSTALL_DIR && \
+    yum -y install which unzip.x86_64 file openssl oracle-database-preinstall-18c
 
 FROM base as gcloud
 
