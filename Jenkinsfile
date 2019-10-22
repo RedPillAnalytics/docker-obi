@@ -8,12 +8,12 @@ pipeline {
    environment {
       DOCKER = credentials('docker-hub')
    }
-
    stages {
       stage('Build') {
          steps {
             sh 'docker build --progress plain -t redpillanalytics/obi 12.2.1.4.0'
          }
+      }
       stage('Publish') {
          when { branch "master" }
          steps {
@@ -22,7 +22,5 @@ pipeline {
             sh "docker push redpillanalytics/obi:latest"
          }
       }
-      // Place for new Stage
-
-   } // end of Stages
+   }
 }
