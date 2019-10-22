@@ -65,10 +65,10 @@ RUN cd $INSTALL_DIR && \
 FROM gcloud as builder
 
 # Download installation media
-RUN gsutil cp gs://software.redpillanalytics.io/database/$INSTALL_FILE_DB $INSTALL_DIR
-RUN gsutil cp gs://software.redpillanalytics.io/fmw/$INSTALL_FILE_WLS $INSTALL_DIR
-RUN gsutil cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_1 $INSTALL_DIR
-RUN gsutil cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_2 $INSTALL_DIR
+RUN gsutil -q cp gs://software.redpillanalytics.io/database/$INSTALL_FILE_DB $INSTALL_DIR
+RUN gsutil -q cp gs://software.redpillanalytics.io/fmw/$INSTALL_FILE_WLS $INSTALL_DIR
+RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_1 $INSTALL_DIR
+RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_2 $INSTALL_DIR
 
 # Install DB
 RUN chown oracle:oinstall $ORACLE_BASE && \

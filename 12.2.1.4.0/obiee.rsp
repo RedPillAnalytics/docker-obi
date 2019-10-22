@@ -34,5 +34,3 @@ ORACLE_HOME=###OBI_HOME###
 
 #Set this variable value to the Installation Type selected. e.g. BI Platform Distribution, BI Platform Distribution with Samples.
 INSTALL_TYPE=BI Platform Distribution with Samples
-
-

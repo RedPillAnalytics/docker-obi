@@ -1,0 +1,23 @@
+kind: Pod
+spec:
+  containers:
+    - name: jnlp
+      env:
+        - name: CONTAINER_ENV_VAR
+          value: jnlp
+    - name: gradle
+      image: gradle
+      command:
+        - cat
+      tty: true
+      env:
+        - name: CONTAINER_ENV_VAR
+          value: gradle
+        - name: GRADLE_USER_HOME
+          value: .gradle
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: Always
+      command:
+      - /busybox/cat
+      tty: true
