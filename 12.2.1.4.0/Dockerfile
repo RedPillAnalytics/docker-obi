@@ -4,7 +4,8 @@ FROM oraclelinux:7-slim as jdk
 ENV JDK=jdk-8u221-linux-x64.tar.gz \
     JDK_DIR=jdk1.8.0_221
 
-RUN yum -y install wget which unzip.x86_64 file openssl oracle-database-preinstall-18c && \
+RUN cd $INSTALL_DIR && \
+    yum -y install wget which unzip.x86_64 file openssl oracle-database-preinstall-18c && \
     wget -q -O $JDK -c --content-disposition \
     "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=239835_230deb18db3e4014bb8e3e8324f81b43" && \
     tar xvzf $JDK
@@ -18,6 +19,7 @@ COPY --chown=root:root --from=jdk $JDK_DIR $JDK_DIR
 ENV ORACLE_BASE=/opt/oracle \
     ORACLE_HOME=/opt/oracle/product/18c/dbhomeXE \
     ORACLE_SID=XE \
+    ORACLE_PWD=Admin123 \
     INSTALL_FILE_DB=oracle-database-xe-18c-1.0-1.x86_64.rpm \
     INSTALL_FILE_WLS=fmw_12.2.1.3.0_infrastructure.jar \
     INSTALL_FILE_BI_1=bi_platform-12.2.1.4.0_linux64.bin \
@@ -73,7 +75,52 @@ RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_2 $INSTA
 # Install DB
 RUN chown oracle:oinstall $ORACLE_BASE && \
     cd $INSTALL_DIR && \
-    yum -y install $INSTALL_FILE_DB
+    yum -y install $INSTALL_FILE_DB && \
+    rm -rf /var/cache/yum && \
+    rm -f $INSTALL_FILE_1 && \
+    rm -rf $ORACLE_HOME/demo && \
+    rm -rf $ORACLE_HOME/dmu && \
+    rm -rf $ORACLE_HOME/javavm && \
+    rm -rf $ORACLE_HOME/md && \
+    rm -rf $ORACLE_HOME/nls/demo && \
+    rm -rf $ORACLE_HOME/odbc && \
+    rm -rf $ORACLE_HOME/rdbms/demo && \
+    rm -rf $ORACLE_HOME/R && \
+    rm -rf $ORACLE_HOME/instantclient && \
+    rm -rf $ORACLE_HOME/inventory && \
+    rm -rf $ORACLE_HOME/deinstall && \
+    rm -r  $ORACLE_HOME/lib/ra_aix_ppc64.zip && \
+    rm -r  $ORACLE_HOME/lib/ra_hpux_ia64.zip && \
+    rm -r  $ORACLE_HOME/lib/ra_solaris*.zip && \
+    rm -f  $ORACLE_HOME/lib/ra_windows64.zip && \
+    rm -f  $ORACLE_HOME/lib/ra_zlinux64.zip && \
+    rm -rf $ORACLE_HOME/crs && \
+    rm -f  $ORACLE_HOME/bin/asmcmd && \
+    rm -f  $ORACLE_HOME/bin/asmcmdcore && \
+    rm -f  $ORACLE_HOME/bin/bdschecksw && \
+    rm -f  £ORACLE_HOME/bin/dbv && \
+    rm -f  $ORACLE_HOME/bin/ldap* && \
+    rm -f  $ORACLE_HOME/bin/dbfs_client && \
+    rm -f  $ORACLE_HOME/bin/afdboot && \
+    rm -f  $ORACLE_HOME/bin/exp && \
+    rm -f  $ORACLE_HOME/bin/imp && \
+    rm -f  $ORACLE_HOME/bin/*.exe && \
+    rm -f  $ORACLE_HOME/bin/lcsscan && \
+    rm -f  $ORACLE_HOME/bin/dgmgrl && \
+    rm -f  $ORACLE_HOME/bin/nid && \
+    rm -f  $ORACLE_HOME/bin/orion && \
+    rm -f  $ORACLE_HOME/bin/procob && \
+    rm -f  $ORACLE_HOME/bin/setasmgid && \
+    rm -f  $ORACLE_HOME/bin/wrap && \
+    rm -f  $ORACLE_HOME/bin/*0 && \
+    rm -f  $ORACLE_HOME/bin/tnsping && \
+    rm -f  $ORACLE_HOME/bin/tkprof && \
+    rm -f  $ORACLE_HOME/bin/srvctl && \
+    rm -f  $ORCALE_HOME/bin/wrc && \
+    rm -rf $ORACLE_HOME/sdk && \
+    strip --remove-section=.comment $ORACLE_HOME/bin/oracle && \
+    strip --remove-section=.comment $ORACLE_HOME/bin/rman && \
+    strip --remove-section=.comment $ORACLE_HOME/bin/tnslsnr
 
 # Replace place holders
 # Force /dev/urandom for java
@@ -105,5 +152,29 @@ RUN touch $ORACLE_BASE/oraInst.loc && \
 
 # Install OBI
 RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
+
+FROM base as runtime
+
+COPY --chown=root:root --from=builder /etc /etc
+COPY --chown=oracle:oinstall --from=builder $ORACLE_BASE $ORACLE_BASE
+
+RUN $ORACLE_BASE/oraInventory/orainstRoot.sh && \
+    $ORACLE_HOME/root.sh && \
+    mkdir -p $ORACLE_BASE/scripts/setup && \
+    mkdir $ORACLE_BASE/scripts/startup && \
+    ln -s $ORACLE_BASE/scripts /docker-entrypoint-initdb.d && \
+    mkdir -p $ORACLE_BASE/oradata $ORACLE_BASE/diag $ORACLE_BASE/fast_recovery_area $ORACLE_BASE/tools /home/oracle && \
+    chown -R oracle:oinstall $ORACLE_BASE/oradata $ORACLE_BASE/diag $ORACLE_BASE/fast_recovery_area $ORACLE_BASE/tools /home/oracle && \
+    mv $INSTALL_DIR/$RUN_DB $ORACLE_BASE/ && \
+    mv $INSTALL_DIR/$PWD_FILE $ORACLE_BASE/ && \
+    mv $INSTALL_DIR/$CHECK_DB_FILE $ORACLE_BASE/ && \
+    mv $INSTALL_DIR/$CONF_FILE /etc/sysconfig/ && \
+    unzip $INSTALL_DIR/$CUSTOM_SQL -d $ORACLE_BASE/scripts/setup && \
+    ln -s $ORACLE_BASE/$PWD_FILE / && \
+    cd $HOME && \
+    rm -rf $INSTALL_DIR && \
+    target_txt=$(cat /etc/security/limits.d/oracle-database-preinstall-18c.conf | grep -e 'oracle *hard *memlock*') && \
+    sed -i "/^$target_txt/ c#$target_txt" /etc/security/limits.d/oracle-database-preinstall-18c.conf && \
+    chmod ug+x $ORACLE_BASE/*.sh
 
 CMD bash
