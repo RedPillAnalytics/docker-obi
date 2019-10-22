@@ -1,4 +1,6 @@
-kind: Pod
+metadata:
+  labels:
+    build-tool: kaniko
 spec:
   containers:
     - name: jnlp

@@ -101,9 +101,9 @@ USER oracle
 RUN touch $ORACLE_BASE/oraInst.loc && \
     echo inventory_loc=$ORACLE_BASE/oraInventory > $ORACLE_BASE/oraInst.loc && \
     echo inst_group= >> $ORACLE_BASE/oraInst.loc && \
-    java -jar $INSTALL_DIR/$INSTALL_FILE_WLS -silent -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_WLS -invPtrLoc $ORACLE_BASE/oraInst.loc
+    java -jar $INSTALL_DIR/$INSTALL_FILE_WLS -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_WLS -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 # Install OBI
-RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
+RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 CMD bash
