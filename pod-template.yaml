@@ -17,9 +17,12 @@ spec:
           value: gradle
         - name: GRADLE_USER_HOME
           value: .gradle
-    # - name: kaniko
-    #   image: gcr.io/kaniko-project/executor:latest
-    #   imagePullPolicy: Always
-    #   command:
-    #   - /busybox/cat
-    #   tty: true
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: Always
+      command:
+      - cat
+      tty: true
+      env:
+        - name: CONTAINER_ENV_VAR
+          value: kaniko
