@@ -45,7 +45,7 @@ while getopts ":d:u:p:r:t:i:sh" opt; do
       USERNAME=$OPTARG;;
     p ) # password
       PASSWORD=$OPTARG;;
-    r ) # password
+    r ) # registry
       REGISTRY=$OPTARG;;
     s ) # sha
       SHA=true;;

@@ -1,6 +1,6 @@
 metadata:
   labels:
-    build-tool: kaniko
+    build-tool: docker
 spec:
   containers:
     - name: jnlp
@@ -13,15 +13,21 @@ spec:
         - cat
       tty: true
       env:
-        - name: CONTAINER_ENV_VAR
-          value: gradle
         - name: GRADLE_USER_HOME
           value: .gradle
     - name: docker
-      image: gcr.io/cloud-builders/docker
+      image: docker:19.03.1
       command:
-        - cat
-      tty: true
+      - sleep
+      args:
+      - 99d
       env:
-        - name: CONTAINER_ENV_VAR
-          value: docker
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+    - name: docker-daemon
+      image: docker:19.03.1-dind
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""

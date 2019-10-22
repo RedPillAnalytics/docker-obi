@@ -5,13 +5,14 @@ pipeline {
 		  yamlFile 'pod-template.yaml'
 		}
 	}
+   environment {
+      DOCKER = credentials('docker-hub')
+   }
 
    stages {
       stage('Build and Publish Image') {
          steps {
-            //sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=gcr.io/rpa-devops/obi'
-            sh 'build -t gcr.io/rpa-devops/obi 12.2.1.4.0'
-            sh 'push gcr.io/rpa-devops/obi'
+            docker-publish -i redpillanalytics/obi -u $DOCKER_USR -p $DOCKER_PSW -d 12.2.1.4.0
          }
       }
       // Place for new Stage
