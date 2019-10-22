@@ -1,7 +1,7 @@
 pipeline {
 	agent {
 		kubernetes {
-		  defaultContainer 'gradle'
+		  defaultContainer 'docker'
 		  yamlFile 'pod-template.yaml'
 		}
 	}
@@ -10,7 +10,8 @@ pipeline {
       stage('Build and Publish Image') {
          steps {
             //sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=gcr.io/rpa-devops/obi'
-            sh 'ls -l'
+            sh 'build -t gcr.io/rpa-devops/obi 12.2.1.4.0'
+            sh 'push gcr.io/rpa-devops/obi'
          }
       }
       // Place for new Stage

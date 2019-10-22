@@ -17,11 +17,11 @@ spec:
           value: gradle
         - name: GRADLE_USER_HOME
           value: .gradle
-    - name: kaniko
-      image: gcr.io/kaniko-project/executor:latest
+    - name: docker
+      image: gcr.io/cloud-builders/docker
       command:
-      - cat
+        - cat
       tty: true
       env:
         - name: CONTAINER_ENV_VAR
-          value: kaniko
+          value: docker
