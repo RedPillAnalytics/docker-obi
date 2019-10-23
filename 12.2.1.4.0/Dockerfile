@@ -50,31 +50,36 @@ ENV OBI_HOME=$ORACLE_BASE/product/$OBIEE_VERSION \
 
 # Copy scripts and configs
 # -------------
-COPY $ADD_GCLOUD $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
+COPY $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
 COPY $CONF_FILE $CHECK_DB_FILE $PWD_FILE $INSTALL_FILE_RSP_CONFIG $RUN_DB $RUN_OBIEE _configureOBIEE.sh _dropRCU.sh _validateRCU.sh $WAIT_DB_CLASS $WAIT_DB_SCRIPT $ORACLE_BASE/
 
 RUN cd $INSTALL_DIR && \
     yum -y install which unzip.x86_64 file openssl oracle-database-preinstall-18c
 
-FROM base as gcloud
+# FROM base as gcloud
 
-# Install gcloud requirements
-RUN cd $INSTALL_DIR && \
-    chmod u+x $ADD_GCLOUD && \
-    ./$ADD_GCLOUD && \
-    yum -y install gcc python-devel python-setuptools redhat-rpm-config python-pip google-cloud-sdk && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir -U crcmod && \
-    rm -rf /var/cache/yum
+# # Install gcloud requirements
+# RUN cd $INSTALL_DIR && \
+#     chmod u+x $ADD_GCLOUD && \
+#     ./$ADD_GCLOUD && \
+#     yum -y install gcc python-devel python-setuptools redhat-rpm-config python-pip google-cloud-sdk && \
+#     pip install --upgrade pip && \
+#     pip install --no-cache-dir -U crcmod && \
+#     rm -rf /var/cache/yum
 
-# New builder stage
-FROM gcloud as builder
+# # New builder stage
+# FROM gcloud as builder
 
-# Download installation media
-RUN gsutil -q cp gs://software.redpillanalytics.io/database/$INSTALL_FILE_DB $INSTALL_DIR
-RUN gsutil -q cp gs://software.redpillanalytics.io/fmw/$INSTALL_FILE_WLS $INSTALL_DIR
-RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_1 $INSTALL_DIR
-RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_2 $INSTALL_DIR
+# # Download installation media
+# RUN gsutil -q cp gs://software.redpillanalytics.io/database/$INSTALL_FILE_DB $INSTALL_DIR
+# RUN gsutil -q cp gs://software.redpillanalytics.io/fmw/$INSTALL_FILE_WLS $INSTALL_DIR
+# RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_1 $INSTALL_DIR
+# RUN gsutil -q cp gs://software.redpillanalytics.io/obi/$INSTALL_FILE_BI_2 $INSTALL_DIR
+
+FROM base AS builder
+
+# Copy installation media
+COPY $INSTALL_FILE_DB $INSTALL_FILE_WLS $INSTALL_FILE_BI_1 $INSTALL_FILE_BI_2 $INSTALL_DIR
 
 # Install DB
 RUN chown oracle:oinstall $ORACLE_BASE && \
