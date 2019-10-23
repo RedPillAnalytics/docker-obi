@@ -96,64 +96,6 @@ function createDB {
 
    (echo "$ORACLE_PWD"; echo "$ORACLE_PWD";) | /etc/init.d/oracle-xe-18c configure
 
-   # Listener 
-   echo "# listener.ora Network Configuration File:
-         
-         SID_LIST_LISTENER = 
-           (SID_LIST =
-             (SID_DESC =
-               (SID_NAME = PLSExtProc)
-               (ORACLE_HOME = $ORACLE_HOME)
-               (PROGRAM = extproc)
-             )
-           )
-         
-         LISTENER =
-           (DESCRIPTION_LIST =
-             (DESCRIPTION =
-               (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC_FOR_XE))
-               (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-             )
-           )
-         
-         DEFAULT_SERVICE_LISTENER = (XE)" > $ORACLE_HOME/network/admin/listener.ora
-
-# TNS Names.ora
-   echo "# tnsnames.ora Network Configuration File:
-
-XE =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = XE)
-    )
-  )
-
-LISTENER_XE =
-  (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-
-XEPDB1 =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = XEPDB1)
-    )
-  )
-
-EXTPROC_CONNECTION_DATA =
-  (DESCRIPTION =
-     (ADDRESS_LIST =
-       (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC_FOR_XE))
-     )
-     (CONNECT_DATA =
-       (SID = PLSExtProc)
-       (PRESENTATION = RO)
-     )
-  )
-" > $ORACLE_HOME/network/admin/tnsnames.ora
-
   # Move database operational files to oradata
   moveFiles;
 }
