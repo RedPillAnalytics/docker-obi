@@ -4,5 +4,4 @@ steps:
   - --destination=gcr.io/$PROJECT_ID/obi
   - --cache=true
   - --cache-ttl=48h
-  - --dockerfile 12.2.1.4.0/Dockerfile
-  
+  - --dockerfile=12.2.1.4.0/Dockerfile
