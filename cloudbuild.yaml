@@ -22,7 +22,7 @@ steps:
     - 'cp'
     - 'gs://software.redpillanalytics.io/obi/bi_platform-12.2.1.4.0_linux64-2.zip'
     - '12.2.1.4.0'
-  id: copy-obi-1
+  id: copy-obi-2
 - name: 'gcr.io/kaniko-project/executor:latest'
   args:
   - --destination=gcr.io/$PROJECT_ID/obi
