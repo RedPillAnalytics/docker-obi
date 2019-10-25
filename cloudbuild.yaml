@@ -6,5 +6,6 @@ steps:
   - --cache-ttl=48h
   - --dockerfile=12.2.1.4.0/Dockerfile
   - --context=/workspace/12.2.1.4.0
+  - --single-snapshot
   id: kaniko-build
 timeout: 3600s
