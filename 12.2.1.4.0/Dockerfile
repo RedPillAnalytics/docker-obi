@@ -74,12 +74,10 @@ RUN touch $ORACLE_BASE/oraInst.loc \
     && java -jar $INSTALL_DIR/$INSTALL_FILE_WLS -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_WLS -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 # Install OBI
-RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc \
-    && rm -f $INSTALL_DIR/$INSTALL_FILE_BI_1
+RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 USER root
-RUN rm -f $INSTALL_DIR/$INSTALL_FILE_WLS \
-    && rm -f $INSTALL_DIR/$INSTALL_FILE_BI_2
+RUN rm -rf $INSTALL_DIR
 
 # CMD exec $ORACLE_BASE/$RUN_DB
 # CMD exec $ORACLE_BASE/$RUN_FILE
