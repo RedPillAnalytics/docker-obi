@@ -13,7 +13,7 @@
 # OBI_HOME=/opt/oracle/product/<version>
 # DOMAIN_HOME=/opt/oracle/config/domains
 
-RSP_FILE=$ORACLE_BASE/bi_config.rsp
+RSP_FILE=$ORACLE_BASE/$CONFIG_FILE_BI_RSP
 ORAINV_LOC=$ORACLE_BASE/oraInst.loc
 HOSTNAME=$(hostname -f)
 

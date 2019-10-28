@@ -13,22 +13,33 @@ ENV JDK=jdk-8u231-linux-x64.rpm \
     CONFIG_FILE_BI_RSP=bi_config.rsp \
     WAIT_DB_CLASS=OracleJDBC.class \
     WAIT_DB_SCRIPT=wait-for-database.sh \
-    RUN_OBIEE=runOBIEE.sh
+    RUN_OBIEE=runOBIEE.sh \
+    RUN_XE=runOracle.sh \
+    BI_CONFIG_RCU_DBSTRING=localhost:1521:xe \
+    BI_CONFIG_RCU_PWD=Admin123 \
+    BI_CONFIG_RCU_DB_PREFIX=BI122140 \
+    BI_CONFIG_RCU_NEW_DB_PWD=Admin123 \
+    ENTRYPOINT=entrypoint.sh
 
 # Separate ENV for substituion
 ENV OBI_HOME=$ORACLE_BASE/product/$OBIEE_VERSION \
     DOMAIN_HOME=$ORACLE_BASE/config/domains \
-    PATH=$DOMAIN_HOME/bi/bitools/bin:$PATH
+    PATH=$DOMAIN_HOME/bi/bitools/bin:$PATH \
+    ORACLE_PWD=$BI_CONFIG_RCU_PWD
+    
 
 # # Copy scripts and configs
 # # -------------
 COPY $RUN_OBIEE \
+     $RUN_XE \
      _configureOBIEE.sh \
      _dropRCU.sh \
      _validateRCU.sh \
      $WAIT_DB_CLASS \
      $WAIT_DB_SCRIPT \
+     $ENTRYPOINT \
      $ORACLE_BASE/
+
 
 # Copy respons files
 COPY $INSTALL_FILE_RSP_WLS $INSTALL_FILE_RSP_BI $INSTALL_DIR/
@@ -44,7 +55,8 @@ RUN curl -o $INSTALL_DIR/$JDK https://s3.amazonaws.com/software.redpillanalytics
 RUN yum -y localinstall $INSTALL_DIR/$JDK \
     && yum -y install which \
     && rm -rf /var/cache/yum \
-    && rm -f $INSTALL_DIR/$JDK
+    && rm -f $INSTALL_DIR/$JDK \
+    && mkdir -p $DOMAIN_HOME
 
 # Replace place holders
 # Force /dev/urandom for java
@@ -77,9 +89,8 @@ RUN touch $ORACLE_BASE/oraInst.loc \
 RUN $INSTALL_DIR/$INSTALL_FILE_BI_1 -silent -ignoreSysPrereqs -novalidation -responseFile $INSTALL_DIR/$INSTALL_FILE_RSP_BI -invPtrLoc $ORACLE_BASE/oraInst.loc
 
 USER root
-RUN rm -rf $INSTALL_DIR
+RUN rm -rf $INSTALL_DIR \
+    && chmod u+x $ORACLE_BASE/$ENTRYPOINT
 
 # CMD exec $ORACLE_BASE/$RUN_DB
-# CMD exec $ORACLE_BASE/$RUN_FILE
-WORKDIR /home/oracle
-CMD bash
+CMD exec $ORACLE_BASE/$ENTRYPOINT
