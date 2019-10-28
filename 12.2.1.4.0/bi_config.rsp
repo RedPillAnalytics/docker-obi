@@ -27,7 +27,7 @@ INSTALL_EXALYTICS_IN_MEMORY_SOFTWARE=false
 SERVICE_INSTANCE_MODE=SINGLE
 
 #The domain to be created
-DOMAIN_NAME=###BI_CONFIG_DOMAINE_NAME###
+DOMAIN_NAME=###BI_CONFIG_DOMAIN_NAME###
 
 #The directory in which the domain home directory will be created
 DOMAINS_DIR=###DOMAIN_HOME###
