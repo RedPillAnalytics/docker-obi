@@ -15,7 +15,7 @@ ENV JDK=jdk-8u231-linux-x64.rpm \
     WAIT_DB_SCRIPT=wait-for-database.sh \
     RUN_OBIEE=runOBIEE.sh \
     RUN_XE=runOracle.sh \
-    BI_CONFIG_RCU_DBSTRING=localhost:1521:xe \
+    BI_CONFIG_RCU_DBSTRING=localhost:1521:xepdb1 \
     BI_CONFIG_RCU_PWD=Admin123 \
     BI_CONFIG_RCU_DB_PREFIX=BI122140 \
     BI_CONFIG_RCU_NEW_DB_PWD=Admin123 \
@@ -51,6 +51,9 @@ RUN curl -o $INSTALL_DIR/$JDK https://s3.amazonaws.com/software.redpillanalytics
     && curl -o $INSTALL_DIR/$INSTALL_FILE_BI_1 https://s3.amazonaws.com/software.redpillanalytics.io/oracle/obi/12.2.1.4.0/$INSTALL_FILE_BI_1 \
     && curl -o $INSTALL_DIR/$INSTALL_FILE_BI_2 https://s3.amazonaws.com/software.redpillanalytics.io/oracle/obi/12.2.1.4.0/$INSTALL_FILE_BI_2
 
+# # Temporary
+# COPY $JDK $INSTALL_FILE_WLS $INSTALL_FILE_BI_1 $INSTALL_FILE_BI_2 $INSTALL_DIR/
+
 # Install JDK
 RUN yum -y localinstall $INSTALL_DIR/$JDK \
     && yum -y install which \
@@ -76,7 +79,8 @@ RUN chmod a+x $INSTALL_DIR/$INSTALL_FILE_BI_1 \
     && chmod a+x $ORACLE_BASE/_configureOBIEE.sh \
     && chmod a+x $ORACLE_BASE/_dropRCU.sh \
     && chmod a+x $ORACLE_BASE/_validateRCU.sh \
-    && chmod a+x $ORACLE_BASE/$RUN_OBIEE
+    && chmod a+x $ORACLE_BASE/$RUN_OBIEE \
+    && chown -R oracle:oinstall /opt/oracle
 
 # Install FMW Infrastructure
 USER oracle
@@ -92,5 +96,6 @@ USER root
 RUN rm -rf $INSTALL_DIR \
     && chmod u+x $ORACLE_BASE/$ENTRYPOINT
 
+EXPOSE 9500-9550
 # CMD exec $ORACLE_BASE/$RUN_DB
 CMD exec $ORACLE_BASE/$ENTRYPOINT
