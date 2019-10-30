@@ -10,7 +10,7 @@
 
 # env variables set by Dockerfile
 # ORACLE_BASE=/opt/oracle
-# ORACLE_HOME=/opt/oracle/product/<version>
+# OBI_HOME=/opt/oracle/product/<version>
 # DOMAIN_HOME=/opt/oracle/config/domains
 
 ########### SIGTERM handler ############
@@ -108,7 +108,6 @@ else
   # Start OBIEE
   startOBIEE;
 fi;
-
 
 echo "#########################"
 $DOMAIN_HOME/$BI_CONFIG_DOMAINE_NAME/bitools/bin/status.sh

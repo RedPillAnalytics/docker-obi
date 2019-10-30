@@ -30,9 +30,7 @@ SOFTWARE_UPDATES_PROXY_USER=
 SOFTWARE_UPDATES_PROXY_PASSWORD=
 
 #The oracle home location. This can be an existing Oracle Home or a new Oracle Home
-ORACLE_HOME=###ORACLE_HOME###
+ORACLE_HOME=###OBI_HOME###
 
 #Set this variable value to the Installation Type selected. e.g. BI Platform Distribution, BI Platform Distribution with Samples.
 INSTALL_TYPE=BI Platform Distribution with Samples
-
-

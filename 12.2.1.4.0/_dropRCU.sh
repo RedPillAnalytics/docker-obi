@@ -10,7 +10,7 @@
 
 # env variables set by Dockerfile
 # ORACLE_BASE=/opt/oracle
-# ORACLE_HOME=/opt/oracle/biee
+# OBI_HOME=/opt/oracle/biee
 
 #
 # set values based on env variables or default values
@@ -102,15 +102,15 @@ RCU_SETTINGS="$RCU_SETTINGS $COMPONENTS"
 #
 # validate RCU drop command and settings 
 #
-$ORACLE_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate <<< $BI_CONFIG_RCU_PWD
+$OBI_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate <<< $BI_CONFIG_RCU_PWD
 
 if [ $? -ne 0 ]; then
   echo "ERROR validating RCU command and settings, can't drop RCU schemas"
-  echo "command: $ORACLE_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate <<< '$BI_CONFIG_RCU_PWD'"
+  echo "command: $OBI_HOME/oracle_common/bin/rcu $RCU_SETTINGS -validate <<< '$BI_CONFIG_RCU_PWD'"
   exit 1
 fi
 
 #
 # drop RCU schemas
 #
-$ORACLE_HOME/oracle_common/bin/rcu $RCU_SETTINGS <<< $BI_CONFIG_RCU_PWD
+$OBI_HOME/oracle_common/bin/rcu $RCU_SETTINGS <<< $BI_CONFIG_RCU_PWD

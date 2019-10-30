@@ -10,11 +10,12 @@
 
 # env variables set by Dockerfile
 # ORACLE_BASE=/opt/oracle
-# ORACLE_HOME=/opt/oracle/product/<version>
+# OBI_HOME=/opt/oracle/product/<version>
 # DOMAIN_HOME=/opt/oracle/config/domains
 
-RSP_FILE=$ORACLE_BASE/bi_config.rsp
+RSP_FILE=$ORACLE_BASE/$CONFIG_FILE_BI_RSP
 ORAINV_LOC=$ORACLE_BASE/oraInst.loc
+HOSTNAME=$(hostname -f)
 
 # if RSP file not found error
 if [ ! -f $RSP_FILE ]; then
@@ -32,18 +33,18 @@ fi
 # set values in RSP file based on env variables or default values
 #
 
-# - ORACLE_HOME
-sed -i -e "s|###ORACLE_HOME###|$ORACLE_HOME|g" $RSP_FILE
+# - OBI_HOME
+sed -i -e "s|###OBI_HOME###|$OBI_HOME|g" $RSP_FILE
 
 # - DOMAIN_HOME
 sed -i -e "s|###DOMAIN_HOME###|$DOMAIN_HOME|g" $RSP_FILE
 
-# - BI_CONFIG_DOMAINE_NAME
-if [ "$BI_CONFIG_DOMAINE_NAME" == "" ]; then
-  BI_CONFIG_DOMAINE_NAME=bi
-  echo "BI_CONFIG_DOMAINE_NAME not defined, default: $BI_CONFIG_DOMAINE_NAME"
+# - BI_CONFIG_DOMAIN_NAME
+if [ "$BI_CONFIG_DOMAIN_NAME" == "" ]; then
+  BI_CONFIG_DOMAIN_NAME=bi
+  echo "BI_CONFIG_DOMAIN_NAME not defined, default: $BI_CONFIG_DOMAIN_NAME"
 fi;
-sed -i -e "s|###BI_CONFIG_DOMAINE_NAME###|$BI_CONFIG_DOMAINE_NAME|g" $RSP_FILE
+sed -i -e "s|###BI_CONFIG_DOMAIN_NAME###|$BI_CONFIG_DOMAIN_NAME|g" $RSP_FILE
 
 # - BI_CONFIG_ADMIN_USER
 if [ "$BI_CONFIG_ADMIN_USER" == "" ]; then
@@ -61,8 +62,8 @@ sed -i -e "s|###BI_CONFIG_ADMIN_PWD###|$BI_CONFIG_ADMIN_PWD|g" $RSP_FILE
 
 # - BI_CONFIG_RCU_DBSTRING
 if [ "$BI_CONFIG_RCU_DBSTRING" == "" ]; then
-  echo "BI_CONFIG_RCU_DBSTRING not defined, can't configure OBIEE"
-  exit 1
+  BI_CONFIG_RCU_DBSTRING="localhost:1521:XE"
+  echo "BI_CONFIG_RCU_DBSTRING not defined, default: $BI_CONFIG_RCU_DBSTRING"
 fi;
 sed -i -e "s|###BI_CONFIG_RCU_DBSTRING###|$BI_CONFIG_RCU_DBSTRING|g" $RSP_FILE
 
@@ -82,7 +83,7 @@ sed -i -e "s|###BI_CONFIG_RCU_PWD###|$BI_CONFIG_RCU_PWD|g" $RSP_FILE
 
 # - BI_CONFIG_RCU_DB_PREFIX
 if [ "$BI_CONFIG_RCU_DB_PREFIX" == "" ]; then
-  BI_CONFIG_RCU_DB_PREFIX=$(hostname -f)
+  BI_CONFIG_RCU_DB_PREFIX=$HOSTNAME
   # DB prefix must start with a letter: replace first digit with 'G-P' (not hexa chars)
   case ${BI_CONFIG_RCU_DB_PREFIX:0:1} in
     0)
@@ -130,4 +131,4 @@ sed -i -e "s|###BI_CONFIG_RCU_NEW_DB_PWD###|$BI_CONFIG_RCU_NEW_DB_PWD|g" $RSP_FI
 #
 # execute configuration
 #
-$ORACLE_HOME/bi/bin/config.sh -silent -responseFile $ORACLE_BASE/bi_config.rsp -invPtrLoc $ORACLE_BASE/oraInst.loc
+$OBI_HOME/bi/bin/config.sh -silent -responseFile $ORACLE_BASE/bi_config.rsp -invPtrLoc $ORACLE_BASE/oraInst.loc

@@ -1,0 +1,33 @@
+metadata:
+  labels:
+    build-tool: docker
+spec:
+  containers:
+    - name: jnlp
+      env:
+        - name: CONTAINER_ENV_VAR
+          value: jnlp
+    - name: gradle
+      image: gradle
+      command:
+        - cat
+      tty: true
+      env:
+        - name: GRADLE_USER_HOME
+          value: .gradle
+    - name: docker
+      image: docker:19.03.1
+      command:
+      - sleep
+      args:
+      - 99d
+      env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+    - name: docker-daemon
+      image: docker:19.03.1-dind
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
