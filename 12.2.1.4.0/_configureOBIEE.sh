@@ -131,4 +131,4 @@ sed -i -e "s|###BI_CONFIG_RCU_NEW_DB_PWD###|$BI_CONFIG_RCU_NEW_DB_PWD|g" $RSP_FI
 #
 # execute configuration
 #
-$OBI_HOME/bi/bin/config.sh -silent -responseFile $ORACLE_BASE/bi_config.rsp -invPtrLoc $ORACLE_BASE/oraInst.loc
+$OBI_HOME/bi/bin/config.sh -silent -ignoreSysPrereqs -novalidation -responseFile $ORACLE_BASE/bi_config.rsp -invPtrLoc $ORACLE_BASE/oraInst.loc
